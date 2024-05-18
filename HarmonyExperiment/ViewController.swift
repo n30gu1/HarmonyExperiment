@@ -5,21 +5,20 @@
 //  Created by Park Seongheon on 5/17/24.
 //
 
-import UIKit
 import SwiftUI
+import UIKit
 
 class ViewController: UIViewController {
-
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
         view.backgroundColor = .systemBackground
         self.navigationItem.title = "Harmony Experiment"
         self.navigationController?.navigationBar.prefersLargeTitles = true
-        
+
         let hosting = UIHostingController(rootView: ContentView())
         view.addSubview(hosting.view)
-        
+
         hosting.view.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
             hosting.view.topAnchor.constraint(equalTo: view.topAnchor),
@@ -28,7 +27,6 @@ class ViewController: UIViewController {
             hosting.view.trailingAnchor.constraint(equalTo: view.trailingAnchor)
         ])
     }
-
 }
 
 #if DEBUG

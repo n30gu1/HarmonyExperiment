@@ -5,8 +5,8 @@
 //  Created by Park Seongheon on 5/18/24.
 //
 
-import UIKit
 import SwiftUI
+import UIKit
 
 class CollectionViewController: UIViewController {
     // Diffable data source
@@ -20,7 +20,7 @@ class CollectionViewController: UIViewController {
     }
     
     struct Item: Hashable {
-        let id: UUID = UUID()
+        let id: UUID = .init()
         let title: String
     }
 
@@ -45,7 +45,7 @@ class CollectionViewController: UIViewController {
     }
     
     func configureDataSource() {
-        let cellRegistration = UICollectionView.CellRegistration<UICollectionViewListCell, Item> { cell, indexPath, item in
+        let cellRegistration = UICollectionView.CellRegistration<UICollectionViewListCell, Item> { cell, _, item in
             var content = cell.defaultContentConfiguration()
             content.text = item.title
             cell.contentConfiguration = content
@@ -60,17 +60,15 @@ class CollectionViewController: UIViewController {
     func applySnapshot() {
         var snapshot = NSDiffableDataSourceSnapshot<Section, Item>()
         snapshot.appendSections([.main])
-        snapshot.appendItems((0...10).map { _ in Item(title: "Hello, World!") })
+        snapshot.appendItems((0 ... 10).map { _ in Item(title: "Hello, World!") })
         dataSource.apply(snapshot, animatingDifferences: false)
     }
 }
 
 // MARK: - UICollectionViewDelegate
+
 extension CollectionViewController: UICollectionViewDelegate {
-    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        
-    }
-    
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {}
 }
 
 extension CollectionViewController {
@@ -79,8 +77,7 @@ extension CollectionViewController {
             CollectionViewController()
         }
         
-        func updateUIViewController(_ uiViewController: CollectionViewController, context: Context) {
-        }
+        func updateUIViewController(_ uiViewController: CollectionViewController, context: Context) {}
     }
 }
 
