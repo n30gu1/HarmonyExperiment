@@ -9,6 +9,8 @@ import SwiftUI
 import UIKit
 
 struct ContentView: View {
+    @ObservedObject var state: ViewControllerState
+    
     var body: some View {
         ZStack {
             CollectionViewController.Representable()
@@ -16,16 +18,20 @@ struct ContentView: View {
             VStack {
                 Spacer()
                 Button("Hello, Harmony!") {
-                    print("Hello, Harmony!")
+                    state.title = "Hello, Harmony!"
                 }
             }
             .frame(alignment: .bottom)
+            .onChange(of: state.title) {
+                print($0)
+            }
         }
     }
 }
 
 struct ContentView_Previews: PreviewProvider {
+    @State static var state = ViewControllerState()
     static var previews: some View {
-        ContentView()
+        ContentView(state: state)
     }
 }
