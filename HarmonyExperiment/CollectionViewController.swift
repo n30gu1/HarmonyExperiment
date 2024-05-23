@@ -5,30 +5,37 @@
 //  Created by Park Seongheon on 5/18/24.
 //
 
+import Combine
 import SwiftUI
 import UIKit
 
 class CollectionViewController: UIViewController {
+    // State
+    weak var state: ViewControllerState?
+    var cancellables = Set<AnyCancellable>()
+    
     // Diffable data source
     private var dataSource: UICollectionViewDiffableDataSource<Section, Item>!
     
     // Collection View
     private var collectionView: UICollectionView!
     
-    enum Section {
-        case main
+    init(state: ViewControllerState) {
+        self.state = state
+        super.init(nibName: nil, bundle: nil)
     }
     
-    struct Item: Hashable {
-        let id: UUID = .init()
-        let title: String
+    @available(*, unavailable)
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
-
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         configureCollectionView()
         configureDataSource()
         applySnapshot()
+        subscribe()
     }
     
     func configureCollectionView() {
@@ -63,6 +70,28 @@ class CollectionViewController: UIViewController {
         snapshot.appendItems((0 ... 10).map { _ in Item(title: "Hello, World!") })
         dataSource.apply(snapshot, animatingDifferences: false)
     }
+    
+    func subscribe() {
+        state?.$sections
+            .sink { [weak self] sections in
+                if var snapshot = self?.dataSource.snapshot() {
+                    snapshot.deleteSections(snapshot.sectionIdentifiers)
+                    snapshot.appendSections(sections)
+                    self?.dataSource.apply(snapshot, animatingDifferences: true)
+                }
+            }
+            .store(in: &cancellables)
+        
+        state?.$items
+            .sink { [weak self] items in
+                if var snapshot = self?.dataSource.snapshot() {
+                    snapshot.deleteItems(snapshot.itemIdentifiers)
+                    snapshot.appendItems(items)
+                    self?.dataSource.apply(snapshot, animatingDifferences: true)
+                }
+            }
+            .store(in: &cancellables)
+    }
 }
 
 // MARK: - UICollectionViewDelegate
@@ -73,17 +102,20 @@ extension CollectionViewController: UICollectionViewDelegate {
 
 extension CollectionViewController {
     struct Representable: UIViewControllerRepresentable {
-        func makeUIViewController(context: Context) -> CollectionViewController {
-            CollectionViewController()
+        @ObservedObject var state: ViewControllerState
+        
+        func makeUIViewController(context: Context) -> some UIViewController {
+            CollectionViewController(state: state)
         }
         
-        func updateUIViewController(_ uiViewController: CollectionViewController, context: Context) {}
+        func updateUIViewController(_ uiViewController: UIViewControllerType, context: Context) {}
     }
 }
 
 #if DEBUG
 @available(iOS 17.0, *)
 #Preview {
-    CollectionViewController()
+    @ObservedObject var state = ViewControllerState()
+    return CollectionViewController(state: state)
 }
 #endif

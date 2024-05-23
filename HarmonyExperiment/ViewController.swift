@@ -5,9 +5,9 @@
 //  Created by Park Seongheon on 5/17/24.
 //
 
+import Combine
 import SwiftUI
 import UIKit
-import Combine
 
 class ViewController: UIViewController {
     var cancellables = Set<AnyCancellable>()
@@ -23,30 +23,25 @@ class ViewController: UIViewController {
     
     func setupView() {
         view.backgroundColor = .systemBackground
-        self.navigationItem.title = "Harmony Experiment"
-        self.navigationController?.navigationBar.prefersLargeTitles = true
+        navigationItem.title = "Harmony Experiment"
+        navigationController?.navigationBar.prefersLargeTitles = true
 
         let hosting = UIHostingController(rootView: ContentView(state: state))
-        view.addSubview(hosting.view)
-
-        hosting.view.translatesAutoresizingMaskIntoConstraints = false
-        NSLayoutConstraint.activate([
-            hosting.view.topAnchor.constraint(equalTo: view.topAnchor),
-            hosting.view.bottomAnchor.constraint(equalTo: view.bottomAnchor),
-            hosting.view.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            hosting.view.trailingAnchor.constraint(equalTo: view.trailingAnchor)
-        ])
+        
+        view.addSubviewWithFullScreen(hosting.view)
     }
     
     func setupSubscription() {
         state.$title
             .sink { [weak self] title in
+                print(title)
                 self?.navigationItem.title = title
             }
             .store(in: &cancellables)
         
         state.$prefersLargeTitles
             .sink { [weak self] prefersLargeTitles in
+                print(prefersLargeTitles)
                 self?.navigationController?.navigationBar.prefersLargeTitles = prefersLargeTitles
             }
             .store(in: &cancellables)
